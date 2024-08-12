@@ -3,6 +3,8 @@ package com.swdev.dscommerce.entities;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="tb_order")
@@ -11,15 +13,18 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
-
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant moment;
-
     private OrderStatus status;
-
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
+    @OneToMany(mappedBy = "id.order")
+    private Set<OrderItem> item = new HashSet<>();
+
+
 
     public Order() {
     }
@@ -61,5 +66,13 @@ public class Order {
 
     public void setClient(User client) {
         this.client = client;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }
