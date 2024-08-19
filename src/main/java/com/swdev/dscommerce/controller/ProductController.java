@@ -6,10 +6,7 @@ import com.swdev.dscommerce.entities.Product;
 import com.swdev.dscommerce.repositories.ProductRepository;
 import com.swdev.dscommerce.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,5 +26,10 @@ public class ProductController {
     @GetMapping
     public Page<ProductDTO> findBAll(Pageable pageable){
         return service.findAll(pageable); // Test
+    }
+
+    @PostMapping
+    public ProductDTO insert (@RequestBody ProductDTO dto){
+        return service.insert(dto);
     }
 }
