@@ -1,12 +1,15 @@
 package com.swdev.dscommerce.controller.handlers;
 
 import com.swdev.dscommerce.dto.CustomError;
+import com.swdev.dscommerce.dto.ValidationError;
 import com.swdev.dscommerce.services.exceptions.DatabaseException;
 import com.swdev.dscommerce.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.vendor.Database;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -22,10 +25,14 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<CustomError> database(DatabaseException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CustomError> methodArgumentNotValid(MethodArgumentNotValidException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        ValidationError err = new ValidationError(Instant.now(), status.value(), "Dados inválidos", request.getRequestURI());
+
+        for (FieldError f : e.getBindingResult().getFieldErrors()){
+            err.addError(f.getField(), f.getDefaultMessage());
+        }
         return ResponseEntity.status(status).body(err);
     }
 }
